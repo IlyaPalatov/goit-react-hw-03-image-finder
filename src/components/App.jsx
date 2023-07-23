@@ -4,6 +4,8 @@ import ImageGallery from './ImageGallery';
 import Button from './Button';
 import Modal from './Modal';
 import Spinner from './Spinner';
+import { fetchImages } from './api';
+
 import '../styles.css';
 
 class App extends Component {
@@ -27,29 +29,25 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.fetchImages();
+    this.fetchImagesFromApi();
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery || prevState.page !== this.state.page) {
-      this.fetchImages();
+      this.fetchImagesFromApi();
     }
   }
 
-  fetchImages = () => {
+  fetchImagesFromApi = () => {
     const { searchQuery, page } = this.state;
     if (!searchQuery) return;
 
     this.setState({ isLoading: true });
 
-    const API_KEY = '37184113-cc7f1841943926b48c61b8d8a';
-    const URL = `https://pixabay.com/api/?q=${searchQuery}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`;
-
-    fetch(URL)
-      .then(response => response.json())
+    fetchImages(searchQuery, page)
       .then(data => {
         this.setState(prevState => ({
-          images: [...prevState.images, ...data.hits],
+          images: [...prevState.images, ...data],
           isLoading: false,
         }));
 
