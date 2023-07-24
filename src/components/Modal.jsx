@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import basicLightbox from 'basiclightbox';
+import 'basiclightbox/dist/basicLightbox.min.css';
 
 class Modal extends Component {
   componentDidMount() {
@@ -15,18 +17,17 @@ class Modal extends Component {
     }
   };
 
-  handleBackdropClick = event => {
-    if (event.currentTarget === event.target) {
-      this.props.onClose();
-    }
+  handleImageClick = () => {
+    const { image } = this.props;
+    const instance = basicLightbox.create(`<img src="${image.largeImageURL}" alt="${image.tags}" />`);
+    instance.show();
   };
 
   render() {
-    const { image } = this.props;
     return (
-      <div className="overlay" onClick={this.handleBackdropClick}>
+      <div className="overlay" onClick={this.props.onClose}>
         <div className="modal">
-          <img src={image.largeImageURL} alt={image.tags} />
+          <img src={this.props.image.webformatURL} alt={this.props.image.tags} onClick={this.handleImageClick} />
         </div>
       </div>
     );

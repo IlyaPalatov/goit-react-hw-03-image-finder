@@ -17,6 +17,7 @@ class App extends Component {
       page: 1,
       isLoading: false,
       selectedImage: null,
+      hasMoreImages: false, 
     };
   }
 
@@ -27,10 +28,6 @@ class App extends Component {
   handleLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
-
-  componentDidMount() {
-    this.fetchImagesFromApi();
-  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery || prevState.page !== this.state.page) {
@@ -46,9 +43,11 @@ class App extends Component {
 
     fetchImages(searchQuery, page)
       .then(data => {
+        const hasMoreImages = data.length >= 12;
         this.setState(prevState => ({
           images: [...prevState.images, ...data],
           isLoading: false,
+          hasMoreImages, 
         }));
 
         window.scrollTo({
@@ -71,13 +70,13 @@ class App extends Component {
   };
 
   render() {
-    const { images, isLoading, selectedImage } = this.state;
+    const { images, isLoading, selectedImage, hasMoreImages } = this.state;
     return (
       <div>
         <Searchbar onSubmit={this.handleFormSubmit} />
         <ImageGallery images={images} onImageClick={this.handleImageClick} />
         {isLoading && <Spinner />}
-        {!!images.length && <Button onClick={this.handleLoadMore} />}
+        {hasMoreImages && <Button onClick={this.handleLoadMore} />}
         {selectedImage && <Modal image={selectedImage} onClose={this.handleCloseModal} />}
       </div>
     );
